@@ -21,12 +21,23 @@ def find_xy(claim_data)
         end
     end
 
-    return claim_xy_coords
+    claim = { 'id' => claim_data['claim_id'], 'xy_coords' => claim_xy_coords }
 end
 
-puts File.readlines('day3input.txt')
+claims = File.readlines('day3input.txt')
     .map { |line| parse_line(line) }
-    .flat_map { |claim_data| find_xy(claim_data) }
+    .map { |claim_data| find_xy(claim_data) }
+
+#Part 1
+overlapping_coords = claims
+    .flat_map { |claim| claim['xy_coords'] }
     .each_with_object(Hash.new(0)) { |xy_coord, counts| counts[xy_coord] += 1 }
     .select { |xy_coord, count| count > 1}
-    .count
+puts overlapping_coords.count
+
+#Part 2
+puts claims
+    .select { |claim| (claim['xy_coords'] & overlapping_coords.keys).empty? }
+    .map { |claim| claim['id'] }
+
+    #.select { |claim| claim['xy_coords'].none? { |xy_coord| overlapping_coords.keys.include?(xy_coord) } }
